@@ -9,11 +9,11 @@ Usually, Linked Lists cost Time Complexity of O(n) for accessing any element, bu
 Time Complexity Per Algorithm (For accessing elements)
 
 Linear Search
-- O(n): Accessing First Time
-- O(1): Accessing more than 1 time/
+- O(n) : Accessing First Time
+- O(1) : Accessing more than 1 time
 
 Binary Search:
-- O(n): Acccesing First Time
+- O(n)     : Acccesing First Time
 - O(log(n) : Accessing Second Time.
 
 
