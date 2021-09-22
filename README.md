@@ -14,7 +14,7 @@ Binary Search:
 - O(log(n) : Accessing Second Time.
 
 ## Garbage Collection
-Comes with built in garbage collection. Using functions `c void clearList(LinkedList *list)` and `c void deleteList(LinkedList *list)` allow users to delete elements stored in linked list and even the linked list itself.
+Comes with built in garbage collection. `void clearList(LinkedList *list)` and `void deleteList(LinkedList *list)` allow users to delete elements stored in linked list and even the linked list itself.
 
 
 ## API
