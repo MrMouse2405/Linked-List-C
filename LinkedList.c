@@ -34,7 +34,8 @@
      -   And If we try to access the third value stored at index 2. This time the program
         will start from the node referenced by "NodeAtCursor" and transverses through the list
         until it finds the node at index 2 and returns it. Then it will increment the "Cursor" value,
-        and "NodeAtCursor" will now point to the node at index 2.
+        and "NodeAtCursor" will now point to the node at index 2. Hence, saving performance because
+        it doesn't have to start from index 0 again.
 
     The program will continue this pattern for accessing values for all indices,
     if the "Cursor" value is greater than the index of the value we want, let's say the "Cursor" is 3,
@@ -141,7 +142,7 @@ typedef struct LinkedList {
 LinkedList * newList() {
 
     // Initialising in Heap and casting it to our data type
-    LinkedList *newList = (LinkedList *) malloc (sizeof(LinkedList));
+    LinkedList *newList = (LinkedList *) malloc (sizeof(struct LinkedList));
 
     // Setting default values
     newList->Head = NULL;
@@ -188,7 +189,7 @@ unsigned int getListSize(LinkedList *list) {
 void addToList(LinkedList *list, void *Value) {
 
     // Initialising new node in heap and casting it to our data type.
-    Node *newNode = (Node *) malloc (sizeof(Node));
+    Node *newNode = (Node *) malloc (sizeof(struct Node));
 
     // Assigning values
     newNode->Value = Value;
@@ -233,26 +234,30 @@ void addToList(LinkedList *list, void *Value) {
 
 /*
 
-    void* getFromList(LinkedList *list, int Index)
+    static Node* get(LinkedList *list, int Index)
 
-    This function returns a value from stored
-    in the node found at the index
+    This function returns the node located at a
+    given index.
+
+    This function is abstracted. Hence, its static.
+    Use getFromList to access a value externally.
 
  */
 
-void* getFromList(LinkedList *list, unsigned int Index) {
 
-    // If Index is 0, the First Node, then return head node's value
+static Node* get(LinkedList *list, unsigned int Index) {
+
+    // If Index is 0, the First Node, then return head node
     if (Index <= 0) // // <= for binary search, sometimes values loose precision because of integer division
-        return list->Head->Value;
+        return list->Head;
 
-    // If Index is the last index, the Last Node (Size - 1), then return tail node's value
+    // If Index is the last index, the Last Node (Size - 1), then return tail node
     if (Index >= list->Size - 1) // >= for binary search, sometimes values loose precision because of integer division
-        return list->Tail->Value;
+        return list->Tail;
 
-    // If Index is same as the cursor value, then return the NodeAtCursor's value
+    // If Index is same as the cursor value, then return the NodeAtCursor
     if (Index == list->Cursor)
-        return list->NodeAtCursor->Value;
+        return list->NodeAtCursor;
 
 
 
@@ -265,7 +270,7 @@ void* getFromList(LinkedList *list, unsigned int Index) {
 
 
 
-    // To get the node to start transversing from
+    // To cache the node to start transversing from
     Node **curNode = NULL;
 
     // To know which path we have chosen [ 1: Head, 2: Tail, 0: Cursor]
@@ -297,13 +302,13 @@ void* getFromList(LinkedList *list, unsigned int Index) {
         curNode = &list->Head;
         ChosenPath = HEAD;
     }
-    // If Closest Path Is From Tail (We have checked If DistanceFromHead is Greater than DistanceFrom Tail,
-    // it's not right? It means it bigger from DistanceFromTail so we didn't check DistanceFromTail < DistanceFromCursor)
+        // If Closest Path Is From Tail (We have checked If DistanceFromHead is Greater than DistanceFrom Tail,
+        // it's not right? It means it bigger from DistanceFromTail so we didn't check DistanceFromTail < DistanceFromCursor)
     else if (DistanceFromTail < DistanceFromCursor) {
         curNode = &list->Tail;
         ChosenPath = TAIL;
     }
-    //Well then, looks like the closest distance is from Cursor
+        //Well then, looks like the closest distance is from Cursor
     else
         curNode = &list->NodeAtCursor;
 
@@ -397,7 +402,7 @@ void* getFromList(LinkedList *list, unsigned int Index) {
 
             }
 
-            // Else if the index is lesser than the cursor, then move left
+                // Else if the index is lesser than the cursor, then move left
             else {
 
                 // Start Moving Backward
@@ -420,8 +425,188 @@ void* getFromList(LinkedList *list, unsigned int Index) {
 
     curNode = &list->NodeAtCursor;
 
-    return (Node*)(*curNode)->Value;
+    return (Node*)(*curNode);
 }
+
+
+/*
+
+    void* getFromList(LinkedList *list, int Index)
+
+    This function returns a value from stored
+    in the node found at the index
+
+ */
+
+void* getFromList(LinkedList *list, unsigned int Index) {
+    return get(list,Index)->Value;
+}
+
+/*
+
+    void addToListAtIndex(LinkedList *list, unsigned int Index)
+
+    Adds a new element to the list at a given index.
+
+ */
+
+void addToListAtIndex(LinkedList *list, void *Value, unsigned int Index) {
+
+    if (Index < 0 || Index >= list->Size) {
+        printf("INDEX OUT OF BOUNDS EXCEPTION. ATTEMPT TO INDEX INVALID INDEX %i\n",Index);
+        exit(-1);
+    }
+
+    Node *newNode  = (Node *) malloc(sizeof(struct Node));
+    newNode->Value = Value;
+    newNode->Next  = NULL;
+    newNode->Last  = NULL;
+
+    Node *CurNode    = NULL;
+    Node *NodeBefore = NULL;
+
+
+    // If Index is 0, adding the node at the start of the list.
+    if (Index == 0) {
+
+        // Cache head node's reference to CurNode
+        CurNode = list->Head;
+
+        // Set Head Node's Last Node Value to new node
+        CurNode->Last = newNode;
+
+        // Set new node's next value to head node ( connecting each other )
+        newNode->Next = CurNode;
+
+        // Now set list's head to new node, because that's our new head node now right?
+        list->Head = newNode;
+
+    }
+
+    // If Index is the last index, adding the node at the end of the list.
+    else if (Index == list->Size - 1) {
+
+        // Cache tail node's reference to CurNode
+        CurNode = list->Tail;
+
+        // Set Tail Node's Next Value to new node
+        CurNode->Next = newNode;
+
+        // Set new node's last value to head node ( connecting each other )
+        newNode->Last = CurNode;
+
+        // Now set list's tail to new node, because that's our new tail node now right?
+        list->Tail = newNode;
+
+    }
+
+    //Well, if the index is somewhere between, we need to find the particular node at index now.
+    else {
+
+        // Cache reference to the node once we find it.
+        CurNode = get(list,Index);
+
+        // Cache reference to the node before it after we find it.
+        NodeBefore = get(list,Index-1);
+
+        // NB NN <- CN
+        // (NB: NodeBefore, NN: NewNode, CN: CurNode, Connections: - or =, Direction: < or > )
+
+        // Now set CurNode's last value to our new node.
+        CurNode->Last = newNode;
+
+        // NB NN <=> CN
+
+        // Now set newNode's next to CurNode
+        newNode->Next = CurNode;
+
+        // NB -> NN <=> CN
+
+        // Now set NodeBefore's next to cur node
+        NodeBefore->Next = newNode;
+
+        // NB <=> NN <=> CN
+
+        // Now set curNode's last to NodeBefore
+        newNode->Last = CurNode;
+
+    }
+
+    // Making sure our NodeAtCursor is not corrupted while adding nodes
+    if (list->Cursor == Index)
+        list->NodeAtCursor = newNode;
+
+    //Incrementing List Size
+    list->Size++;
+
+}
+
+/*
+
+    void clearList(LinkedList *list)
+
+    Clears all elements in the list, and collects garbage.
+
+*/
+
+void clearList(LinkedList *list) {
+
+    // Get first node
+    Node *curNode = list->Head;
+
+    // To store reference to next node
+    Node *NextNode;
+
+    while (curNode != NULL) {
+        NextNode = curNode->Next;
+
+        // GC Data Stored in the Node
+        free(curNode->Value);
+
+        // GC Node
+        free(curNode);
+
+        // Assign Node
+        curNode = NextNode;
+
+    }
+
+    list->Head = NULL;
+    list->Tail = NULL;
+    list->NodeAtCursor = NULL;
+
+    list->Size = 0;
+    list->Cursor = 0;
+
+}
+
+
+/*
+
+    void deleteList(LinkedList *list)
+
+    Completely clears all the elements in the list,
+    and deletes the list.
+
+*/
+
+void deleteList(LinkedList *list) {
+
+    // Clear all elements in the list.
+    clearList(list);
+
+    // Delete List
+    free(list);
+
+    // Assign Pointer to Null
+    list = NULL;
+}
+
+/*
+
+    Algorithms
+
+*/
 
 
 /*

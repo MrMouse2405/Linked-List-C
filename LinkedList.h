@@ -1,9 +1,6 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-#define TRUE  1
-#define FALSE 0
-
 // Linked List Data Type
 typedef struct LinkedList LinkedList;
 
@@ -41,7 +38,7 @@ unsigned int getListCursorPosition(LinkedList *list);
     void addToList(LinkedList *list, void *Value)
 
     - To add a new value to the list.
-    - O(1) Time, O(n) Space
+    - O(1) Time, O(1) Space
 
  */
 
@@ -51,11 +48,46 @@ void addToList(LinkedList *list, void *Value);
 
     void * getFromList(LinkedList *list, int Index)
 
-    - To get a value from the list.
-     - O(1) to O(n) Time, O(n) Space
+    - Returns a value from the list found at provided index.
+     - O(1) to O(n) Time, O(1) Space
  */
 
 void* getFromList(LinkedList *list, unsigned int Index);
+
+/*
+
+    void addToListAtIndex(LinkedList *list, unsigned int Index)
+
+    - Adds a new element to the list at a given index.
+    - O(1) to O(n) Time, O(1) Space
+
+ */
+
+void addToListAtIndex(LinkedList *list, void *Value, unsigned int Index);
+
+/*
+
+    void clearList(LinkedList *list)
+
+    - Clears all elements in the list, and collects garbage.
+    - O(n) Time, O(1) Space
+
+*/
+
+void clearList(LinkedList *list);
+
+
+/*
+
+    void deleteList(LinkedList *list)
+
+    - Completely clears all the elements in the list,
+      and deletes the list.
+    - O(n) Time, O(1) Space
+
+*/
+
+void deleteList(LinkedList *list);
 
 
 /*
