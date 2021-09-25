@@ -16,21 +16,21 @@ LinkedList *newList();
 
 /*
 
-    unsigned int getListSize(LinkedList *list)
+    int getListSize(LinkedList *list)
 
     - Returns Size of List
 
  */
-unsigned int getListSize(LinkedList *list);
+int getListSize(LinkedList *list);
 
 /*
 
-    unsigned int getListCursorPosition(LinkedList *list)
+    int getListCursorPosition(LinkedList *list)
     - Returns the Position of the Cursor
 
  */
 
-unsigned int getListCursorPosition(LinkedList *list);
+int getListCursorPosition(LinkedList *list);
 
 
 /*
@@ -52,18 +52,29 @@ void addToList(LinkedList *list, void *Value);
      - O(1) to O(n) Time, O(1) Space
  */
 
-void* getFromList(LinkedList *list, unsigned int Index);
+void* getFromList(LinkedList *list, int Index);
 
 /*
 
-    void addToListAtIndex(LinkedList *list, unsigned int Index)
+    void addToListAtIndex(LinkedList *list, int Index)
 
     - Adds a new element to the list at a given index.
     - O(1) to O(n) Time, O(1) Space
 
  */
 
-void addToListAtIndex(LinkedList *list, void *Value, unsigned int Index);
+void addToListAtIndex(LinkedList *list, void *Value, int Index);
+
+/*
+
+    void removeFromListAtIndex(LinkedList *list, int Index);
+
+    - Removes a value from the list.
+    - O(1) to O(n) Time, O(1) Space
+
+*/
+
+void removeFromListAtIndex(LinkedList *list, int Index);
 
 /*
 
@@ -107,7 +118,7 @@ void forEachElementInList(LinkedList *list, void(*f)(void*));
 
 /*
 
-    void BinarySearch(LinkedList *list, void(*Evaluate)(void*),void *Destination, unsigned int *Index)
+    void BinarySearch(LinkedList *list, void(*Evaluate)(void*),void *Destination, int *Index)
 
     - Performs a Binary Search on the list, applies the function Evaluate on the indexed element to evaluate it.
     - Once evaluated, it will assign *Destination the value of the node, and *Index the index of the node.
@@ -120,7 +131,7 @@ void forEachElementInList(LinkedList *list, void(*f)(void*));
 
  */
 
-void BinarySearch(LinkedList *list,void *Target ,int(*Evaluate)(void* Value, void* Target, unsigned short int* MoveRight),void *Destination, unsigned int *Index);
+void BinarySearch(LinkedList *list,void *Target ,int(*Evaluate)(void* Value, void* Target, unsigned short int* MoveRight),void *Destination, int *Index);
 
 
 #endif

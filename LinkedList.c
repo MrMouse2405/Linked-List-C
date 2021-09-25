@@ -62,8 +62,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TRUE  1
-#define FALSE 0
+// To know which path we have chosen [ 1: Head, 2: Tail, 0: Cursor]
+#define HEAD 1
+#define TAIL 2
+#define CURSOR 0
 
 /*
 
@@ -119,13 +121,13 @@ typedef struct LinkedList {
     Node *Tail;
 
     // Size
-    unsigned int Size;
+    int Size;
 
     // Recently accessed Node's Index
-    unsigned int Cursor;
+    int Cursor;
 
     // Recently accessed Node
-    Node  *NodeAtCursor;
+    Node *NodeAtCursor;
 
 } LinkedList;
 
@@ -139,10 +141,10 @@ typedef struct LinkedList {
 
 */
 
-LinkedList * newList() {
+LinkedList *newList() {
 
     // Initialising in Heap and casting it to our data type
-    LinkedList *newList = (LinkedList *) malloc (sizeof(struct LinkedList));
+    LinkedList *newList = (LinkedList *) malloc(sizeof(struct LinkedList));
 
     // Setting default values
     newList->Head = NULL;
@@ -157,23 +159,23 @@ LinkedList * newList() {
 
 /*
 
-    unsigned int getListCursorPosition(LinkedList *list)
+    int getListCursorPosition(LinkedList *list)
     - Returns the Position of the Cursor
 
  */
 
-unsigned int getListCursorPosition(LinkedList *list) {
+int getListCursorPosition(LinkedList *list) {
     return list->Cursor;
 }
 
 /*
 
-    unsigned int getListSize(LinkedList *list)
+    int getListSize(LinkedList *list)
     - Returns the size of the list
 
  */
 
-unsigned int getListSize(LinkedList *list) {
+int getListSize(LinkedList *list) {
     return list->Size;
 }
 
@@ -189,11 +191,11 @@ unsigned int getListSize(LinkedList *list) {
 void addToList(LinkedList *list, void *Value) {
 
     // Initialising new node in heap and casting it to our data type.
-    Node *newNode = (Node *) malloc (sizeof(struct Node));
+    Node *newNode = (Node *) malloc(sizeof(struct Node));
 
     // Assigning values
     newNode->Value = Value;
-    newNode->Next  = NULL;
+    newNode->Next = NULL;
     newNode->Last = NULL;
 
     // Increment The Size
@@ -213,7 +215,7 @@ void addToList(LinkedList *list, void *Value) {
 
     }
 
-    // If elements already exist in list (Size > 1)
+        // If elements already exist in list (Size > 1)
     else {
 
         // Get Tail Node (last node)
@@ -245,7 +247,7 @@ void addToList(LinkedList *list, void *Value) {
  */
 
 
-static Node* get(LinkedList *list, unsigned int Index) {
+static Node *get(LinkedList *list, int Index) {
 
     // If Index is 0, the First Node, then return head node
     if (Index <= 0) // // <= for binary search, sometimes values loose precision because of integer division
@@ -269,16 +271,10 @@ static Node* get(LinkedList *list, unsigned int Index) {
      */
 
 
-
     // To cache the node to start transversing from
     Node **curNode = NULL;
 
-    // To know which path we have chosen [ 1: Head, 2: Tail, 0: Cursor]
-    #define HEAD 1
-    #define TAIL 2
-    #define CURSOR 0
-
-    int  ChosenPath = CURSOR;
+    int ChosenPath = CURSOR;
 
     /*
 
@@ -292,9 +288,10 @@ static Node* get(LinkedList *list, unsigned int Index) {
      */
 
     // Calculating The Distance
-    unsigned int DistanceFromHead = Index;
-    unsigned int DistanceFromTail = (list->Size-1) - Index;
-    unsigned int DistanceFromCursor = abs(list->Cursor - Index);
+    int DistanceFromHead = Index;
+    int DistanceFromTail = (list->Size - 1) - Index;
+    int DistanceFromCursor = abs(list->Cursor - Index);
+
 
     // If Closest Path Is From Head
     // <= to handle stalemate situationsWhat if DistanceFromHead == DistanceFromTail?.
@@ -332,7 +329,7 @@ static Node* get(LinkedList *list, unsigned int Index) {
         case HEAD: {
 
             // Start Moving Forwards From Head, until we find the Node we want
-            for (unsigned int i = 0; i < DistanceFromHead; ++i) {
+            for (int i = 0; i < DistanceFromHead; ++i) {
                 curNode = &(((Node *) (*curNode))->Next);
             }
 
@@ -358,14 +355,13 @@ static Node* get(LinkedList *list, unsigned int Index) {
         case TAIL: {
 
             // Start Moving Backwards From TAIL, until we find the Node we want
-            for (unsigned int i = 0; i < DistanceFromHead; ++i) {
+            for (int i = 0; i < DistanceFromTail; ++i) {
                 curNode = &(((Node *) (*curNode))->Last);
             }
 
             // Update the Cursor Value (We are subtracting list size from DistanceFromTail,
             // because that's how many node's we are away from the list's end)
             list->Cursor = (getListSize(list) - 1) - DistanceFromTail;
-            printf("%i\n", list->Cursor);
 
             // Make the NodeAtCursor point towards this.
             list->NodeAtCursor = *curNode;
@@ -393,7 +389,7 @@ static Node* get(LinkedList *list, unsigned int Index) {
             if (Index > list->Cursor) {
 
                 // Start Moving Forward
-                for (unsigned int i = 0; i < DistanceFromCursor; ++i) {
+                for (int i = 0; i < DistanceFromCursor; ++i) {
                     curNode = &(((Node *) (*curNode))->Next);
                 }
 
@@ -406,7 +402,7 @@ static Node* get(LinkedList *list, unsigned int Index) {
             else {
 
                 // Start Moving Backward
-                for (unsigned int i = 0; i < DistanceFromCursor; ++i) {
+                for (int i = 0; i < DistanceFromCursor; ++i) {
                     curNode = &(((Node *) (*curNode))->Last);
                 }
 
@@ -425,7 +421,7 @@ static Node* get(LinkedList *list, unsigned int Index) {
 
     curNode = &list->NodeAtCursor;
 
-    return (Node*)(*curNode);
+    return (Node *) (*curNode);
 }
 
 
@@ -438,31 +434,31 @@ static Node* get(LinkedList *list, unsigned int Index) {
 
  */
 
-void* getFromList(LinkedList *list, unsigned int Index) {
-    return get(list,Index)->Value;
+void *getFromList(LinkedList *list, int Index) {
+    return get(list, Index)->Value;
 }
 
 /*
 
-    void addToListAtIndex(LinkedList *list, unsigned int Index)
+    void addToListAtIndex(LinkedList *list, int Index)
 
     Adds a new element to the list at a given index.
 
  */
 
-void addToListAtIndex(LinkedList *list, void *Value, unsigned int Index) {
+void addToListAtIndex(LinkedList *list, void *Value, int Index) {
 
     if (Index < 0 || Index >= list->Size) {
-        printf("INDEX OUT OF BOUNDS EXCEPTION. ATTEMPT TO INDEX INVALID INDEX %i\n",Index);
+        printf("INDEX OUT OF BOUNDS EXCEPTION. ATTEMPT TO INDEX INVALID INDEX %i\n", Index);
         exit(-1);
     }
 
-    Node *newNode  = (Node *) malloc(sizeof(struct Node));
+    Node *newNode = (Node *) malloc(sizeof(struct Node));
     newNode->Value = Value;
-    newNode->Next  = NULL;
-    newNode->Last  = NULL;
+    newNode->Next = NULL;
+    newNode->Last = NULL;
 
-    Node *CurNode    = NULL;
+    Node *CurNode = NULL;
     Node *NodeBefore = NULL;
 
 
@@ -483,7 +479,7 @@ void addToListAtIndex(LinkedList *list, void *Value, unsigned int Index) {
 
     }
 
-    // If Index is the last index, adding the node at the end of the list.
+        // If Index is the last index, adding the node at the end of the list.
     else if (Index == list->Size - 1) {
 
         // Cache tail node's reference to CurNode
@@ -500,14 +496,14 @@ void addToListAtIndex(LinkedList *list, void *Value, unsigned int Index) {
 
     }
 
-    //Well, if the index is somewhere between, we need to find the particular node at index now.
+        //Well, if the index is somewhere between, we need to find the particular node at index now.
     else {
 
         // Cache reference to the node once we find it.
-        CurNode = get(list,Index);
+        CurNode = get(list, Index);
 
         // Cache reference to the node before it after we find it.
-        NodeBefore = get(list,Index-1);
+        NodeBefore = get(list, Index - 1);
 
         // NB NN <- CN
         // (NB: NodeBefore, NN: NewNode, CN: CurNode, Connections: - or =, Direction: < or > )
@@ -540,6 +536,109 @@ void addToListAtIndex(LinkedList *list, void *Value, unsigned int Index) {
     list->Size++;
 
 }
+
+/*
+
+    void removeFromListAtIndex(LinkedList *list, int Index);
+
+    To Remove a value from the list
+
+*/
+
+void removeFromListAtIndex(LinkedList *list, int Index) {
+
+    if (Index < 0 || Index >= list->Size) {
+        printf("INDEX OUT OF BOUNDS EXCEPTION. ATTEMPT TO INDEX INVALID INDEX %i\n", Index);
+        exit(-1);
+    }
+
+    /*
+
+        If the node we need to remove is the head node,
+        then remove the head node, and set the node after
+        it as head.
+
+    */
+    if (Index == 0) {
+
+        // Get our node to move
+        Node *ToMove = list->Head->Next;
+
+        // Remove Head Node
+        free(list->Head);
+
+        // Remove reference to head node stored in the
+        // node next to it
+        ToMove->Last = NULL;
+
+        // Set our ToMove node as list's head
+        list->Head = ToMove;
+
+        // Now, if the Cursor is pointing to head,
+        // we don't want to mess it up, so we fix it.
+        if (list->Cursor == HEAD)
+            list->NodeAtCursor = ToMove;
+
+    }
+
+        /*
+
+            If the node we need to remove is the tail node,
+            then remove the tail node, and set the node after
+            it as tail.
+
+        */
+
+    else if (Index == list->Size - 1) {
+
+        // Get our node to move
+        Node *ToMove = list->Tail->Last;
+
+        // Remove Tail Node
+        free(list->Tail);
+
+        // Remove reference to tail node stored in the
+        // node before it
+        ToMove->Next = NULL;
+
+        // Set our ToMove node as list's tail
+        list->Tail = ToMove;
+
+        // Now, if the Cursor is pointing to tail,
+        // we don't want to mess it up, so we fix it.
+        if (list->Cursor == list->Size - 1)
+            list->NodeAtCursor = ToMove;
+
+    }
+
+        /*
+
+            If the node we need to remove is somewhere
+            located between head and tail, we need to
+            find the node and remove it.
+
+        */
+
+    else {
+
+
+        Node *ToRemove = get(list, Index);
+        Node *Before = ToRemove->Last;
+        Node *After = ToRemove->Next;
+
+        // Interconnecting Node Before and After
+        // Ghosting ToRemove Node from the list.
+        Before->Next = After;
+        After->Last = Before;
+
+        // Deleting Node
+        free(ToRemove);
+
+    }
+
+    list->Size--;
+}
+
 
 /*
 
@@ -620,7 +719,7 @@ void deleteList(LinkedList *list) {
 
  */
 
-void forEachElementInList(LinkedList *list, void(*f)(void*)) {
+void forEachElementInList(LinkedList *list, void(*f)(void *)) {
 
     // Get Start Node
     Node *curNode = list->Head;
@@ -635,7 +734,7 @@ void forEachElementInList(LinkedList *list, void(*f)(void*)) {
 
 /*
 
-    void BinarySearch(LinkedList *list, int(*Evaluate)(void* Value,unsigned short int* MoveRight),void *Destination, unsigned int *Index)
+    void BinarySearch(LinkedList *list, int(*Evaluate)(void* Value,unsigned short int* MoveRight),void *Destination, int *Index)
 
     Perform a Binary Search on the list, applies the function Evaluate on the indexed element to evaluate it.
     Once evaluated, it will return assigned *Destination the value of the node, and *Index the index of the node.
@@ -645,12 +744,14 @@ void forEachElementInList(LinkedList *list, void(*f)(void*)) {
     OR TO ZERO IF BINARY SEARCH SHOULD MOVE LEFT
 
  */
-void BinarySearch(LinkedList *list,void *Target ,int(*Evaluate)(void* Value, void* Target, unsigned short int* MoveRight),void *Destination, unsigned int *Index){
+void
+BinarySearch(LinkedList *list, void *Target, int(*Evaluate)(void *Value, void *Target, unsigned short int *MoveRight),
+             void *Destination, int *Index) {
 
     // Binary Search Algorithm
 
-    unsigned int Start  = 0;
-    unsigned int End   = getListSize(list) - 1;
+    int Start = 0;
+    int End = getListSize(list) - 1;
 
     void *Value = NULL;
     unsigned short int MoveRight = 0;
@@ -659,13 +760,13 @@ void BinarySearch(LinkedList *list,void *Target ,int(*Evaluate)(void* Value, voi
     while (Start <= End) {
 
         // Get the Middle
-        unsigned int Middle = Start + (End - Start) / 2;
+        int Middle = Start + (End - Start) / 2;
 
         // Get Middle Value
-        Value = getFromList(list,Middle);
+        Value = getFromList(list, Middle);
 
         // If Evaluated, set Destination and Index values, break out of loop
-        if (Evaluate(Value,Target,&MoveRight)) {
+        if (Evaluate(Value, Target, &MoveRight)) {
             Destination = Value;
             *Index = Middle;
             break;
